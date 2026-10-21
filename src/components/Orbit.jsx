@@ -14,10 +14,14 @@ export default function Orbit() {
   useLayoutEffect(() => {
     if (!desktop) return;
     const n = list.length, step = (Math.PI * 2) / n;
+    const orbitY = () => {
+      const cardHeight = cards.current.find((el) => el)?.offsetHeight || 0;
+      return Math.max(0, Math.min(window.innerHeight * 0.2, (window.innerHeight - cardHeight - 40) / 2));
+    };
     const place = (p) => cards.current.forEach((el, i) => {
       if (!el) return;
       const th = (i - p) * step, c = Math.cos(th), s = Math.sin(th), k = (c + 1) / 2;
-      gsap.set(el, { xPercent: -50, yPercent: -50, x: s * Math.min(window.innerWidth * 0.36, 560), y: c * window.innerHeight * 0.27 + window.innerHeight * 0.06, scale: 0.5 + 0.5 * k, opacity: 0.25 + 0.75 * k, zIndex: Math.round(k * 10) });
+      gsap.set(el, { xPercent: -50, yPercent: -50, x: s * Math.min(window.innerWidth * 0.44, 560), y: c * orbitY(), scale: 0.5 + 0.5 * k, opacity: 0.25 + 0.75 * k, zIndex: Math.round(k * 10) });
     });
     const ctx = gsap.context(() => {
       const st = { p: 0 }; place(0);
@@ -60,8 +64,13 @@ export default function Orbit() {
         <a className="orbit__link" href={a.url} target="_blank" rel="noreferrer">View tour <ArrowUpRight size={18} /></a>
       </div>
       {list.map((t, i) => (
-        <a key={t.id} ref={(el) => (cards.current[i] = el)} className={`orbit__card ${i === active ? 'is-on' : ''}`} href={t.url} target="_blank" rel="noreferrer" aria-label={`${t.name}, ${t.nights}`} tabIndex={i === active ? 0 : -1}>
-          <img src={t.img} alt="" loading="lazy" width="540" height="720" /><span>{t.place}</span>
+        <a key={t.id} ref={(el) => (cards.current[i] = el)} className={`orbit__card ${i === active ? 'is-on' : ''}`} href={t.url} target="_blank" rel="noreferrer" aria-label={`${t.place}: ${t.name}, ${t.nights}`} tabIndex={i === active ? 0 : -1}>
+          <img src={t.img} alt="" loading="lazy" width="540" height="720" />
+          <span className="orbit__meta">
+            <span className="orbit__place">{t.place}</span>
+            <strong>{t.name}</strong>
+            <small>{t.nights}</small>
+          </span>
         </a>
       ))}
     </section>
